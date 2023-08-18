@@ -80,10 +80,10 @@ inline fun <R, T : R, E> Resource<T, E>.getOrElse(onElse: () -> R): R {
 
 fun <T, E> Resource<T, E>.getOrNull() = getOrElse { null }
 
-@Throws(IllegalStateException::class)
+
 fun <T> Resource<T, *>.getOrThrow(
-    message: String = "$this isn't success",
-) = getOrElse { error(message) }
+    error: Throwable = Throwable("$this isn't success"),
+) = getOrElse { throw error }
 
 // parser
 

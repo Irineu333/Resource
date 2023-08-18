@@ -250,11 +250,11 @@ class ResourceKtTest {
             "getOrThrow must return data when success"
         )
 
-        assertThrows<IllegalStateException> {
+        assertThrows<Throwable> {
             Resource.Result.Failure(Unit).getOrThrow()
         }
 
-        assertThrows<IllegalStateException> {
+        assertThrows<Throwable> {
             Resource.Loading.getOrThrow()
         }
     }
