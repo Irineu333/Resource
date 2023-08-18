@@ -142,14 +142,65 @@ class ResourceKtTest {
 
     @Test
     fun ifSuccess() {
+
+        var onSuccessCalled = false
+
+        Resource.Result.Success("test data").ifSuccess {
+            assertEquals("test data", it)
+            onSuccessCalled = true
+        }
+
+        assertTrue(onSuccessCalled)
+
+        listOf(
+            Resource.Result.Failure(Unit),
+            Resource.Loading
+        ).forEach { resource ->
+            resource.ifSuccess {
+                fail("${resource::class.java.simpleName} don't call onSuccess")
+            }
+        }
     }
 
     @Test
     fun ifFailure() {
+        var onFailureCalled = false
+
+        Resource.Result.Failure("test error").ifFailure {
+            assertEquals("test error", it)
+            onFailureCalled = true
+        }
+
+        assertTrue(onFailureCalled)
+
+        listOf(
+            Resource.Result.Success(Unit),
+            Resource.Loading
+        ).forEach { resource ->
+            resource.ifFailure {
+                fail("${resource::class.java.simpleName} don't call onFailure")
+            }
+        }
     }
 
     @Test
     fun ifLoading() {
+        var onLoadingCalled = false
+
+        Resource.Loading.ifLoading {
+            onLoadingCalled = true
+        }
+
+        assertTrue(onLoadingCalled)
+
+        listOf(
+            Resource.Result.Success(Unit),
+            Resource.Result.Failure(Unit)
+        ).forEach { resource ->
+            resource.ifLoading {
+                fail("${resource::class.java.simpleName} don't call onLoading")
+            }
+        }
     }
 
     @Test
