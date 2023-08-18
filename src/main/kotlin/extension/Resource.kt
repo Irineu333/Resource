@@ -70,15 +70,7 @@ inline fun <T, E> Resource<T, E>.ifLoading(
 
 // getter
 
-inline fun <R, T : R, E> Resource.Result<T, E>.getOrElse(
-    onElse: (E) -> R,
-) = when (this) {
-    is Resource.Result.Failure -> onElse(error)
-    is Resource.Result.Success -> data
-}
-
-
-inline fun <R, T : R> Resource<T, *>.getOrElse(onElse: () -> R): R {
+inline fun <R, T : R, E> Resource<T, E>.getOrElse(onElse: () -> R): R {
 
     ifSuccess { return it }
 
@@ -86,7 +78,7 @@ inline fun <R, T : R> Resource<T, *>.getOrElse(onElse: () -> R): R {
 }
 
 
-fun <T> Resource<T, *>.getOrNull() = getOrElse { null }
+fun <T, E> Resource<T, E>.getOrNull() = getOrElse { null }
 
 @Throws(IllegalStateException::class)
 fun <T> Resource<T, *>.getOrThrow(

@@ -1,9 +1,11 @@
 package extension
 
 import Resource
-import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.opentest4j.AssertionFailedError
+
 
 class ResourceKtTest {
 
@@ -157,7 +159,7 @@ class ResourceKtTest {
             Resource.Loading
         ).forEach { resource ->
             resource.ifSuccess {
-                fail("${resource::class.java.simpleName} don't call onSuccess")
+                fail("${resource::class.java.simpleName} don't must call onSuccess")
             }
         }
     }
@@ -178,7 +180,7 @@ class ResourceKtTest {
             Resource.Loading
         ).forEach { resource ->
             resource.ifFailure {
-                fail("${resource::class.java.simpleName} don't call onFailure")
+                fail("${resource::class.java.simpleName} don't must call onFailure")
             }
         }
     }
@@ -198,25 +200,64 @@ class ResourceKtTest {
             Resource.Result.Failure(Unit)
         ).forEach { resource ->
             resource.ifLoading {
-                fail("${resource::class.java.simpleName} don't call onLoading")
+                fail("${resource::class.java.simpleName} don't must call onLoading")
             }
         }
     }
 
     @Test
     fun getOrElse() {
-    }
 
-    @Test
-    fun testGetOrElse() {
+        assertEquals(
+            "test data",
+            Resource.Result.Success("test data").getOrElse {
+                fail("getOrElse don't must call onElse when success")
+            },
+            "getOrElse must return data when success",
+        )
+
+        var failureOnElse = false
+
+        Resource.Result.Failure(Unit).getOrElse {
+            failureOnElse = true
+        }
+
+        var loadingOnElse = false
+
+        Resource.Loading.getOrElse {
+            loadingOnElse = true
+        }
+
+        assertTrue(failureOnElse)
+        assertTrue(loadingOnElse)
     }
 
     @Test
     fun getOrNull() {
+        listOf(
+            Pair(Resource.Result.Success("test data"), "test data"),
+            Pair(Resource.Result.Failure("test error"), null),
+            Pair(Resource.Loading, null),
+        ).forEach { (resource, expected) ->
+            assertEquals(expected, resource.getOrNull())
+        }
     }
 
     @Test
     fun getOrThrow() {
+        assertEquals(
+            "test data",
+            Resource.Result.Success("test data").getOrThrow(),
+            "getOrThrow must return data when success"
+        )
+
+        assertThrows<IllegalStateException> {
+            Resource.Result.Failure(Unit).getOrThrow()
+        }
+
+        assertThrows<IllegalStateException> {
+            Resource.Loading.getOrThrow()
+        }
     }
 
     @Test
