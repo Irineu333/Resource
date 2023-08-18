@@ -86,3 +86,10 @@ fun <T> Resource<T, *>.getOrNull() = getOrElse { null }
 fun <T> Resource<T, *>.getOrThrow(
     message: String = "$this isn't success",
 ) = getOrElse { error(message) }
+
+// parser
+
+fun <T> Resource.Result<T, Throwable>.toResult() = when (this) {
+    is Resource.Result.Success -> Result.success(data)
+    is Resource.Result.Failure -> Result.failure(error)
+}
