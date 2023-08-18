@@ -4,7 +4,6 @@ import Resource
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opentest4j.AssertionFailedError
 
 
 class ResourceKtTest {
@@ -262,5 +261,16 @@ class ResourceKtTest {
 
     @Test
     fun toResult() {
+        assertEquals(
+            Result.success("test data"),
+            Resource.Result.Success("test data").toResult()
+        )
+
+        val exception = Throwable("Test Error")
+
+        assertEquals(
+            Result.failure<Unit>(exception),
+            Resource.Result.Failure(exception).toResult()
+        )
     }
 }
