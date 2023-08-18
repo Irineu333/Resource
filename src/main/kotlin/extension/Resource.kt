@@ -20,6 +20,13 @@ inline fun <T, E, T2> Resource<T, E>.mapSuccess(
     Resource.Loading -> Resource.Loading
 }
 
+inline fun <T, E, T2> Resource.Result<T, E>.mapSuccess(
+    transform: (T) -> T2
+) = when (this) {
+    is Resource.Result.Failure -> Resource.Result.Failure(error)
+    is Resource.Result.Success -> Resource.Result.Success(transform(data))
+}
+
 inline fun <T, E, E2> Resource<T, E>.mapError(
     transform: (E) -> E2
 ) = when (this) {
@@ -28,13 +35,12 @@ inline fun <T, E, E2> Resource<T, E>.mapError(
     Resource.Loading -> Resource.Loading
 }
 
-inline fun <T, E, T2> Resource.Result<T, E>.mapSuccess(
-    transform: (T) -> T2
-) = asResource().mapSuccess(transform)
-
 inline fun <T, E, E2> Resource.Result<T, E>.mapError(
     transform: (E) -> E2
-) = asResource().mapError(transform)
+) = when (this) {
+    is Resource.Result.Failure -> Resource.Result.Failure(transform(error))
+    is Resource.Result.Success -> Resource.Result.Success(data)
+}
 
 // action
 

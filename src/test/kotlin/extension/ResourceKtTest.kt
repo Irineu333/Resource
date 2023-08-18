@@ -35,25 +35,109 @@ class ResourceKtTest {
     }
 
     @Test
-    fun asResource() {
-        Resource.Result.Success(Unit).asResource()
-        Resource.Result.Failure(Unit).asResource()
+    fun result_mapSuccess() {
+        listOf(
+            Pair(Resource.Result.Success(listOf("one")), listOf("one", "two")),
+            Pair(Resource.Result.Failure("error"), "error"),
+        ).map {
+            it.copy(
+                first = it.first.mapSuccess { data ->
+                    data + "two"
+                }
+            )
+        }.forEach { (resource, expected) ->
+            when (resource) {
+                is Resource.Result.Success -> {
+                    assertEquals(expected, resource.data)
+                }
+
+                is Resource.Result.Failure -> {
+                    assertEquals(expected, resource.error)
+                }
+            }
+        }
     }
 
     @Test
-    fun mapSuccess() {
+    fun resource_mapSuccess() {
+        listOf(
+            Pair(Resource.Result.Success(listOf("one")), listOf("one", "two")),
+            Pair(Resource.Result.Failure("error"), "error"),
+            Pair(Resource.Loading, "loading"),
+        ).map {
+            it.copy(
+                first = it.first.mapSuccess { data ->
+                    data + "two"
+                }
+            )
+        }.forEach { (resource, expected) ->
+            when (resource) {
+                is Resource.Result.Success -> {
+                    assertEquals(expected, resource.data)
+                }
+
+                is Resource.Result.Failure -> {
+                    assertEquals(expected, resource.error)
+                }
+
+                Resource.Loading -> {
+                    assertEquals(expected, "loading")
+                }
+            }
+        }
     }
 
     @Test
-    fun mapError() {
+    fun result_mapError() {
+        listOf(
+            Pair(Resource.Result.Success("data"), "data"),
+            Pair(Resource.Result.Failure(listOf("one")), listOf("one", "two")),
+        ).map {
+            it.copy(
+                first = it.first.mapError { data ->
+                    data + "two"
+                }
+            )
+        }.forEach { (resource, expected) ->
+            when (resource) {
+                is Resource.Result.Success -> {
+                    assertEquals(expected, resource.data)
+                }
+
+                is Resource.Result.Failure -> {
+                    assertEquals(expected, resource.error)
+                }
+            }
+        }
     }
 
     @Test
-    fun testMapSuccess() {
-    }
+    fun resource_mapError() {
+        listOf(
+            Pair(Resource.Result.Success("data"), "data"),
+            Pair(Resource.Result.Failure(listOf("one")), listOf("one", "two")),
+            Pair(Resource.Loading, "loading"),
+        ).map {
+            it.copy(
+                first = it.first.mapError { data ->
+                    data + "two"
+                }
+            )
+        }.forEach { (resource, expected) ->
+            when (resource) {
+                is Resource.Result.Success -> {
+                    assertEquals(expected, resource.data)
+                }
 
-    @Test
-    fun testMapError() {
+                is Resource.Result.Failure -> {
+                    assertEquals(expected, resource.error)
+                }
+
+                Resource.Loading -> {
+                    assertEquals(expected, "loading")
+                }
+            }
+        }
     }
 
     @Test
