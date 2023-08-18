@@ -1,3 +1,4 @@
+import extension.asResource
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -16,7 +17,16 @@ class ResourceTest {
     }
 
     @Test
-    fun loadingResource_shouldBeLoading() {
+    fun loadingResource_shouldBeAlwaysEquals() {
         assertEquals(Resource.Loading, Resource.Loading)
+    }
+
+    @Test
+    fun resource_whenRemainingBranches() {
+        when (Resource.Result.Success("testing").asResource()) {
+            is Resource.Result.Success -> Unit
+            is Resource.Result.Failure -> Unit
+            Resource.Loading -> Unit
+        }
     }
 }
