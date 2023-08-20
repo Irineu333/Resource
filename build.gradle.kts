@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.neo.resource"
-version = "1.0-DEV"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -28,7 +28,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.neo.resource"
             artifactId = "resource"
-            version = "1.0-DEV"
+            version = "1.0"
 
             from(components["java"])
         }
