@@ -52,7 +52,23 @@ inline fun <T, E> Resource<T, E>.ifSuccess(
     }
 }
 
+inline fun <T, E> Resource.Result<T, E>.ifSuccess(
+    onSuccess: (T) -> Unit,
+) = apply {
+    if (this is Resource.Result.Success) {
+        onSuccess(data)
+    }
+}
+
 inline fun <T, E> Resource<T, E>.ifFailure(
+    onError: (E) -> Unit,
+) = apply {
+    if (this is Resource.Result.Failure) {
+        onError(error)
+    }
+}
+
+inline fun <T, E> Resource.Result<T, E>.ifFailure(
     onError: (E) -> Unit,
 ) = apply {
     if (this is Resource.Result.Failure) {
