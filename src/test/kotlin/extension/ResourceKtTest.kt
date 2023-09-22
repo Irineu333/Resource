@@ -1,11 +1,18 @@
+@file:Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
+
 package extension
 
 import Resource
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-
+/**
+ * @author Irineu A. Silva
+ * Testing [Resource] extensions
+ */
 class ResourceKtTest {
 
     @Test
@@ -37,23 +44,32 @@ class ResourceKtTest {
 
     @Test
     fun result_mapSuccess() {
-        listOf(
-            Pair(Resource.Result.Success(listOf("one")), listOf("one", "two")),
-            Pair(Resource.Result.Failure("error"), "error"),
-        ).map {
-            it.copy(
-                first = it.first.mapSuccess { data ->
-                    data + "two"
-                }
-            )
-        }.forEach { (resource, expected) ->
+
+        // given
+
+        val resultToMap = listOf(
+            Resource.Result.Success(listOf("one")),
+            Resource.Result.Failure("error"),
+        )
+
+        // then
+
+        val resultMapped = resultToMap.map { result ->
+            result.mapSuccess { data ->
+                data + "two"
+            }
+        }
+
+        // when
+
+        resultMapped.forEach { resource ->
             when (resource) {
                 is Resource.Result.Success -> {
-                    assertEquals(expected, resource.data)
+                    assertEquals(listOf("one", "two"), resource.data)
                 }
 
                 is Resource.Result.Failure -> {
-                    assertEquals(expected, resource.error)
+                    assertEquals("error", resource.error)
                 }
             }
         }
@@ -61,28 +77,37 @@ class ResourceKtTest {
 
     @Test
     fun resource_mapSuccess() {
-        listOf(
-            Pair(Resource.Result.Success(listOf("one")), listOf("one", "two")),
-            Pair(Resource.Result.Failure("error"), "error"),
-            Pair(Resource.Loading, "loading"),
-        ).map {
-            it.copy(
-                first = it.first.mapSuccess { data ->
-                    data + "two"
-                }
-            )
-        }.forEach { (resource, expected) ->
+
+        // given
+
+        val resourceToMap = listOf(
+            Resource.Result.Success(listOf("one")),
+            Resource.Result.Failure("error"),
+            Resource.Loading
+        )
+
+        // when
+
+        val resourceMapped = resourceToMap.map { resource ->
+            resource.mapSuccess { data ->
+                data + "two"
+            }
+        }
+
+        // then
+
+        resourceMapped.forEach { resource ->
             when (resource) {
                 is Resource.Result.Success -> {
-                    assertEquals(expected, resource.data)
+                    assertEquals(listOf("one", "two"), resource.data)
                 }
 
                 is Resource.Result.Failure -> {
-                    assertEquals(expected, resource.error)
+                    assertEquals("error", resource.error)
                 }
 
                 Resource.Loading -> {
-                    assertEquals(expected, "loading")
+                    assertEquals(Resource.Loading, resource)
                 }
             }
         }
@@ -90,23 +115,32 @@ class ResourceKtTest {
 
     @Test
     fun result_mapError() {
-        listOf(
-            Pair(Resource.Result.Success("data"), "data"),
-            Pair(Resource.Result.Failure(listOf("one")), listOf("one", "two")),
-        ).map {
-            it.copy(
-                first = it.first.mapError { data ->
-                    data + "two"
-                }
-            )
-        }.forEach { (resource, expected) ->
-            when (resource) {
+
+        // given
+
+        val resultToMap = listOf(
+            Resource.Result.Success("data"),
+            Resource.Result.Failure(listOf("one"))
+        )
+
+        // when
+
+        val resultMapped = resultToMap.map { result ->
+            result.mapError { error ->
+                error + "two"
+            }
+        }
+
+        // then
+
+        resultMapped.forEach { result ->
+            when (result) {
                 is Resource.Result.Success -> {
-                    assertEquals(expected, resource.data)
+                    assertEquals("data", result.data)
                 }
 
                 is Resource.Result.Failure -> {
-                    assertEquals(expected, resource.error)
+                    assertEquals(listOf("one", "two"), result.error)
                 }
             }
         }
@@ -114,156 +148,143 @@ class ResourceKtTest {
 
     @Test
     fun resource_mapError() {
-        listOf(
-            Pair(Resource.Result.Success("data"), "data"),
-            Pair(Resource.Result.Failure(listOf("one")), listOf("one", "two")),
-            Pair(Resource.Loading, "loading"),
-        ).map {
-            it.copy(
-                first = it.first.mapError { data ->
-                    data + "two"
-                }
-            )
-        }.forEach { (resource, expected) ->
+
+        // given
+
+        val resourceToMap = listOf(
+            Resource.Result.Success("data"),
+            Resource.Result.Failure(listOf("one")),
+            Resource.Loading
+        )
+
+        // when
+
+        val resourceMapped = resourceToMap.map {
+            it.mapError { error ->
+                error + "two"
+            }
+        }
+
+        // then
+
+        resourceMapped.forEach { resource ->
             when (resource) {
                 is Resource.Result.Success -> {
-                    assertEquals(expected, resource.data)
+                    assertEquals("data", resource.data)
                 }
 
                 is Resource.Result.Failure -> {
-                    assertEquals(expected, resource.error)
+                    assertEquals(listOf("one", "two"), resource.error)
                 }
 
                 Resource.Loading -> {
-                    assertEquals(expected, "loading")
+                    assertEquals(Resource.Loading, resource)
                 }
             }
         }
     }
 
     @Test
-    fun ifSuccess() {
+    fun resource_ifSuccess() {
 
-        var onSuccessCalled = false
+        val doCall: (Data) -> Unit = spyk()
+        val notToCall: (Data) -> Unit = spyk()
 
-        Resource.Result.Success("test data").ifSuccess {
-            assertEquals("test data", it)
-            onSuccessCalled = true
-        }
+        Resource.Result.Success(Data).asResource().ifSuccess(doCall)
+        Resource.Result.Failure(Error).asResource().ifSuccess(notToCall)
+        Resource.Loading.ifSuccess(notToCall)
 
-        assertTrue(onSuccessCalled)
-
-        listOf(
-            Resource.Result.Failure(Unit),
-            Resource.Loading
-        ).forEach { resource ->
-            resource.ifSuccess {
-                fail("${resource::class.java.simpleName} don't must call onSuccess")
-            }
-        }
+        verify(atMost = 1) { doCall(Data) }
+        verify(inverse = true) { notToCall(any()) }
     }
 
     @Test
-    fun ifFailure() {
-        var onFailureCalled = false
+    fun result_ifSuccess() {
 
-        Resource.Result.Failure("test error").ifFailure {
-            assertEquals("test error", it)
-            onFailureCalled = true
-        }
+        val doCall: (Data) -> Unit = spyk()
+        val notToCall: (Data) -> Unit = spyk()
 
-        assertTrue(onFailureCalled)
+        Resource.Result.Success(Data).ifSuccess(doCall)
+        Resource.Result.Failure(Error).ifSuccess(notToCall)
 
-        listOf(
-            Resource.Result.Success(Unit),
-            Resource.Loading
-        ).forEach { resource ->
-            resource.ifFailure {
-                fail("${resource::class.java.simpleName} don't must call onFailure")
-            }
-        }
+        verify(atMost = 1) { doCall(Data) }
+        verify(inverse = true) { notToCall(any()) }
     }
 
     @Test
-    fun ifLoading() {
-        var onLoadingCalled = false
+    fun resource_ifFailure() {
 
-        Resource.Loading.ifLoading {
-            onLoadingCalled = true
-        }
+        val doCall: (Error) -> Unit = spyk()
+        val notToCall: (Error) -> Unit = spyk()
 
-        assertTrue(onLoadingCalled)
+        Resource.Result.Success(Data).asResource().ifFailure(notToCall)
+        Resource.Result.Failure(Error).asResource().ifFailure(doCall)
+        Resource.Loading.ifFailure(notToCall)
 
-        listOf(
-            Resource.Result.Success(Unit),
-            Resource.Result.Failure(Unit)
-        ).forEach { resource ->
-            resource.ifLoading {
-                fail("${resource::class.java.simpleName} don't must call onLoading")
-            }
-        }
+        verify(atMost = 1) { doCall(Error) }
+        verify(inverse = true) { notToCall(any()) }
+    }
+
+    @Test
+    fun result_ifFailure() {
+
+        val doCall: (Error) -> Unit = spyk()
+        val notToCall: (Error) -> Unit = spyk()
+
+        Resource.Result.Success(Data).ifFailure(notToCall)
+        Resource.Result.Failure(Error).ifFailure(doCall)
+
+        verify(atMost = 1) { doCall(Error) }
+        verify(inverse = true) { notToCall(any()) }
+    }
+
+    @Test
+    fun resource_ifLoading() {
+
+        val doCall: () -> Unit = spyk()
+        val notToCall: () -> Unit = spyk()
+
+        Resource.Result.Success(Data).asResource().ifLoading(notToCall)
+        Resource.Result.Failure(Error).asResource().ifLoading(notToCall)
+        Resource.Loading.ifLoading(doCall)
+
+        verify(atMost = 1) { doCall() }
+        verify(inverse = true) { notToCall() }
     }
 
     @Test
     fun getOrElse() {
 
-        assertEquals(
-            "test data",
-            Resource.Result.Success("test data").getOrElse {
-                fail("getOrElse don't must call onElse when success")
-            },
-            "getOrElse must return data when success",
-        )
+        val doCall: () -> Unit = spyk()
+        val notToCall: () -> Unit = spyk()
 
-        var failureOnElse = false
+        Resource.Result.Success(Data).getOrElse(notToCall)
+        Resource.Result.Failure(Error).getOrElse(doCall)
+        Resource.Loading.getOrElse(doCall)
 
-        Resource.Result.Failure(Unit).getOrElse {
-            failureOnElse = true
-        }
-
-        var loadingOnElse = false
-
-        Resource.Loading.getOrElse {
-            loadingOnElse = true
-        }
-
-        assertTrue(failureOnElse)
-        assertTrue(loadingOnElse)
+        verify(atMost = 2) { doCall() }
+        verify(inverse = true) { notToCall() }
     }
 
     @Test
     fun getOrNull() {
-        listOf(
-            Pair(Resource.Result.Success("test data"), "test data"),
-            Pair(Resource.Result.Failure("test error"), null),
-            Pair(Resource.Loading, null),
-        ).forEach { (resource, expected) ->
-            assertEquals(expected, resource.getOrNull())
-        }
+        assertEquals(Data, Resource.Result.Success(Data).getOrNull())
+        assertNull(Resource.Result.Failure(Error).getOrNull())
+        assertNull(Resource.Loading.getOrNull())
     }
 
     @Test
     fun getOrThrow() {
-        assertEquals(
-            "test data",
-            Resource.Result.Success("test data").getOrThrow(),
-            "getOrThrow must return data when success"
-        )
-
-        assertThrows<Throwable> {
-            Resource.Result.Failure(Unit).getOrThrow()
-        }
-
-        assertThrows<Throwable> {
-            Resource.Loading.getOrThrow()
-        }
+        assertEquals(Data, Resource.Result.Success(Data).getOrThrow())
+        assertThrows<Throwable> { Resource.Result.Failure(Unit).getOrThrow() }
+        assertThrows<Throwable> { Resource.Loading.getOrThrow() }
     }
 
     @Test
     fun toResult() {
         assertEquals(
-            Result.success("test data"),
-            Resource.Result.Success("test data").toResult()
+            Result.success(Data),
+            Resource.Result.Success(Data).toResult()
         )
 
         val exception = Throwable("Test Error")
@@ -273,4 +294,7 @@ class ResourceKtTest {
             Resource.Result.Failure(exception).toResult()
         )
     }
+
+    data object Data
+    data object Error
 }

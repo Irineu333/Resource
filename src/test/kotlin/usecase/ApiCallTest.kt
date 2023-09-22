@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.test.assertEquals
 
+/**
+ * @author Irineu A. Silva
+ * Testing use case in API call
+ */
 @ExtendWith(MockKExtension::class)
 class ApiCallTest {
 
