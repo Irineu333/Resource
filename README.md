@@ -4,7 +4,7 @@ Complete solution for handling success, failure, and loading states in Kotlin.
 
 ## Loading
 
-Use the sealed class [`Resource`](src%2Fmain%2Fkotlin%2FResource.kt) with loading states.
+Use the sealed class [`Resource`](src/main/kotlin/Resource.kt) with loading states.
 
 ``` kotlin
 ordersRepository.flow.collect { resource ->
@@ -29,7 +29,7 @@ when (ordersRepository.getOrders()) {
 
 ## Extensions
 
-The library comes with some basi basic [extensions](src%2Fmain%2Fkotlin%2Fextension%2FResource.kt) to handle and
+The library comes with some basi basic [extensions](src/main/kotlin/extension/Resource.kt) to handle and
 manipulate the states.
 
 ## kotlin.Result
