@@ -29,7 +29,7 @@ when (ordersRepository.getOrders()) {
 
 ## Extensions
 
-The library comes with some basi basic [extensions](src/main/kotlin/extension/Resource.kt) to handle and
+The library comes with some basic [extensions](src/main/kotlin/extension/Resource.kt) to handle and
 manipulate the states.
 
 ## kotlin.Result
@@ -54,7 +54,9 @@ suspend fun getOrders(): Resource.Result<List<Order>, String> {
 
 ## Releases
 
-Add the jitpack to project in `build.gradle.kts` or `settings.gradle.kts`:
+The latest release is available on [JitPack](https://jitpack.io/#NeoUtils/Resource).
+
+Add the jitpack to project in root `build.gradle.kts` or `settings.gradle.kts`:
 
 ``` kotlin
 repositories { 
