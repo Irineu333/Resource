@@ -1,4 +1,4 @@
-# Resource [![](https://jitpack.io/v/Irineu333/Resource.svg) ](https://jitpack.io/#Irineu333/Highlight)
+# Resource ![](https://jitpack.io/v/Irineu333/Resource.svg)
 
 Complete solution for handling success, failure, and loading states in Kotlin.
 
@@ -58,7 +58,6 @@ Add the jitpack to project in `build.gradle.kts` or `settings.gradle.kts`:
 
 ``` kotlin
 repositories { 
-
     maven { url = uri("https://jitpack.io") }
 }
 ```
