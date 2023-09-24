@@ -18,8 +18,8 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Build
-        run: ./gradlew build
+      - name: Assemble
+        run: ./gradlew assemble
 
       - name: Tests
         run: ./gradlew test
