@@ -1,10 +1,10 @@
-# Resource [![](https://jitpack.io/v/Irineu333/Resource.svg) ](https://jitpack.io/#Irineu333/Highlight)
+# Resource ![](https://jitpack.io/v/Irineu333/Resource.svg)
 
 Complete solution for handling success, failure, and loading states in Kotlin.
 
 ## Loading
 
-Use the sealed class [`Resource`](src%2Fmain%2Fkotlin%2FResource.kt) with loading states.
+Use the sealed class [`Resource`](src/main/kotlin/Resource.kt) with loading states.
 
 ``` kotlin
 ordersRepository.flow.collect { resource ->
@@ -29,7 +29,7 @@ when (ordersRepository.getOrders()) {
 
 ## Extensions
 
-The library comes with some basi basic [extensions](src%2Fmain%2Fkotlin%2Fextension%2FResource.kt) to handle and
+The library comes with some basi basic [extensions](src/main/kotlin/extension/Resource.kt) to handle and
 manipulate the states.
 
 ## kotlin.Result
@@ -52,13 +52,12 @@ suspend fun getOrders(): Resource.Result<List<Order>, String> {
 }
 ```
 
-## Add to project (Gradle)
+## Releases
 
 Add the jitpack to project in `build.gradle.kts` or `settings.gradle.kts`:
 
 ``` kotlin
 repositories { 
-
     maven { url = uri("https://jitpack.io") }
 }
 ```
@@ -67,4 +66,14 @@ Add the dependence to module:
 
 ``` kotlin
 implementation("com.github.NeoUtils:Resource:{version}")
+```
+
+## License
+```
+Copyright (c) 2023 Irineu A. Silva
+
+This project is licensed under the terms of the MIT License, 
+a permissive open-source license that allows for the use, modification, 
+and distribution of the code, provided that copyright notices and 
+the license statement are included in all copies or modifications. 
 ```

@@ -18,5 +18,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Run tests
+      - name: Assemble
+        run: ./gradlew assemble
+
+      - name: Tests
         run: ./gradlew test
+
+      - name: Publish
+        run: ./gradlew publishToMavenLocal
