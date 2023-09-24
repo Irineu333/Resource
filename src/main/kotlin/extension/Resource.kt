@@ -12,7 +12,7 @@ fun <T, E> Resource.Result<T, E>.asResource() = this as Resource<T, E>
 
 // map
 
-inline fun <T, E, T2> Resource<T, E>.mapSuccess(
+fun <T, E, T2> Resource<T, E>.mapSuccess(
     transform: (T) -> T2
 ) = when (this) {
     is Resource.Result.Failure -> Resource.Result.Failure(error)
@@ -20,14 +20,14 @@ inline fun <T, E, T2> Resource<T, E>.mapSuccess(
     Resource.Loading -> Resource.Loading
 }
 
-inline fun <T, E, T2> Resource.Result<T, E>.mapSuccess(
+fun <T, E, T2> Resource.Result<T, E>.mapSuccess(
     transform: (T) -> T2
 ) = when (this) {
     is Resource.Result.Failure -> Resource.Result.Failure(error)
     is Resource.Result.Success -> Resource.Result.Success(transform(data))
 }
 
-inline fun <T, E, E2> Resource<T, E>.mapError(
+fun <T, E, E2> Resource<T, E>.mapError(
     transform: (E) -> E2
 ) = when (this) {
     is Resource.Result.Failure -> Resource.Result.Failure(transform(error))
@@ -35,7 +35,7 @@ inline fun <T, E, E2> Resource<T, E>.mapError(
     Resource.Loading -> Resource.Loading
 }
 
-inline fun <T, E, E2> Resource.Result<T, E>.mapError(
+fun <T, E, E2> Resource.Result<T, E>.mapError(
     transform: (E) -> E2
 ) = when (this) {
     is Resource.Result.Failure -> Resource.Result.Failure(transform(error))
@@ -52,12 +52,24 @@ inline fun <T, E> Resource<T, E>.ifSuccess(
     }
 }
 
+inline fun <T, E> Resource.Result<T, E>.ifSuccess(
+    onSuccess: (T) -> Unit,
+) = apply {
+    asResource().ifSuccess(onSuccess)
+}
+
 inline fun <T, E> Resource<T, E>.ifFailure(
     onError: (E) -> Unit,
 ) = apply {
     if (this is Resource.Result.Failure) {
         onError(error)
     }
+}
+
+inline fun <T, E> Resource.Result<T, E>.ifFailure(
+    onError: (E) -> Unit,
+) = apply {
+    asResource().ifFailure(onError)
 }
 
 inline fun <T, E> Resource<T, E>.ifLoading(

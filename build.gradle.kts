@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.neo.resource"
-version = "1.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.13.8")
 }
 
 tasks.test {
@@ -20,7 +21,10 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+        vendor.set(JvmVendorSpec.ORACLE)
+    }
 }
 
 publishing {
@@ -28,7 +32,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.neo.resource"
             artifactId = "resource"
-            version = "1.0"
+            version = "1.1.0"
 
             from(components["java"])
         }
