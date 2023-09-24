@@ -52,7 +52,7 @@ suspend fun getOrders(): Resource.Result<List<Order>, String> {
 }
 ```
 
-## Add to project (Gradle)
+## Releases
 
 Add the jitpack to project in `build.gradle.kts` or `settings.gradle.kts`:
 
@@ -67,4 +67,14 @@ Add the dependence to module:
 
 ``` kotlin
 implementation("com.github.NeoUtils:Resource:{version}")
+```
+
+## License
+```
+Copyright (c) 2023 Irineu A. Silva
+
+This project is licensed under the terms of the MIT License, 
+a permissive open-source license that allows for the use, modification, 
+and distribution of the code, provided that copyright notices and 
+the license statement are included in all copies or modifications. 
 ```
