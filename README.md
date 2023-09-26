@@ -52,6 +52,12 @@ suspend fun getOrders(): Resource.Result<List<Order>, String> {
 }
 ```
 
+## Coverage
+
+One hundred percent of the code covered by unit tests.
+
+![img.png](coverage-v1.1.0.png)
+
 ## Releases
 
 The latest release is available on [JitPack](https://jitpack.io/#NeoUtils/Resource).
