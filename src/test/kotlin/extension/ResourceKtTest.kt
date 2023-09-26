@@ -8,6 +8,8 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import util.model.DataTest
+import util.model.ErrorTest
 
 /**
  * @author Irineu A. Silva
@@ -187,54 +189,54 @@ class ResourceKtTest {
     @Test
     fun resource_ifSuccess() {
 
-        val doCall: (Data) -> Unit = spyk()
-        val notToCall: (Data) -> Unit = spyk()
+        val doCall: (DataTest) -> Unit = spyk()
+        val notToCall: (DataTest) -> Unit = spyk()
 
-        Resource.Result.Success(Data).asResource().ifSuccess(doCall)
-        Resource.Result.Failure(Error).asResource().ifSuccess(notToCall)
+        Resource.Result.Success(DataTest).asResource().ifSuccess(doCall)
+        Resource.Result.Failure(Error()).asResource().ifSuccess(notToCall)
         Resource.Loading.ifSuccess(notToCall)
 
-        verify(atMost = 1) { doCall(Data) }
+        verify(atMost = 1) { doCall(DataTest) }
         verify(inverse = true) { notToCall(any()) }
     }
 
     @Test
     fun result_ifSuccess() {
 
-        val doCall: (Data) -> Unit = spyk()
-        val notToCall: (Data) -> Unit = spyk()
+        val doCall: (DataTest) -> Unit = spyk()
+        val notToCall: (DataTest) -> Unit = spyk()
 
-        Resource.Result.Success(Data).ifSuccess(doCall)
-        Resource.Result.Failure(Error).ifSuccess(notToCall)
+        Resource.Result.Success(DataTest).ifSuccess(doCall)
+        Resource.Result.Failure(ErrorTest()).ifSuccess(notToCall)
 
-        verify(atMost = 1) { doCall(Data) }
+        verify(atMost = 1) { doCall(DataTest) }
         verify(inverse = true) { notToCall(any()) }
     }
 
     @Test
     fun resource_ifFailure() {
 
-        val doCall: (Error) -> Unit = spyk()
-        val notToCall: (Error) -> Unit = spyk()
+        val doCall: (ErrorTest) -> Unit = spyk()
+        val notToCall: (ErrorTest) -> Unit = spyk()
 
-        Resource.Result.Success(Data).asResource().ifFailure(notToCall)
-        Resource.Result.Failure(Error).asResource().ifFailure(doCall)
+        Resource.Result.Success(DataTest).asResource().ifFailure(notToCall)
+        Resource.Result.Failure(ErrorTest()).asResource().ifFailure(doCall)
         Resource.Loading.ifFailure(notToCall)
 
-        verify(atMost = 1) { doCall(Error) }
+        verify(atMost = 1) { doCall(ErrorTest()) }
         verify(inverse = true) { notToCall(any()) }
     }
 
     @Test
     fun result_ifFailure() {
 
-        val doCall: (Error) -> Unit = spyk()
-        val notToCall: (Error) -> Unit = spyk()
+        val doCall: (ErrorTest) -> Unit = spyk()
+        val notToCall: (ErrorTest) -> Unit = spyk()
 
-        Resource.Result.Success(Data).ifFailure(notToCall)
-        Resource.Result.Failure(Error).ifFailure(doCall)
+        Resource.Result.Success(DataTest).ifFailure(notToCall)
+        Resource.Result.Failure(ErrorTest()).ifFailure(doCall)
 
-        verify(atMost = 1) { doCall(Error) }
+        verify(atMost = 1) { doCall(ErrorTest()) }
         verify(inverse = true) { notToCall(any()) }
     }
 
@@ -244,8 +246,8 @@ class ResourceKtTest {
         val doCall: () -> Unit = spyk()
         val notToCall: () -> Unit = spyk()
 
-        Resource.Result.Success(Data).asResource().ifLoading(notToCall)
-        Resource.Result.Failure(Error).asResource().ifLoading(notToCall)
+        Resource.Result.Success(DataTest).asResource().ifLoading(notToCall)
+        Resource.Result.Failure(Error()).asResource().ifLoading(notToCall)
         Resource.Loading.ifLoading(doCall)
 
         verify(atMost = 1) { doCall() }
@@ -258,8 +260,8 @@ class ResourceKtTest {
         val doCall: () -> Unit = spyk()
         val notToCall: () -> Unit = spyk()
 
-        Resource.Result.Success(Data).getOrElse(notToCall)
-        Resource.Result.Failure(Error).getOrElse(doCall)
+        Resource.Result.Success(DataTest).getOrElse(notToCall)
+        Resource.Result.Failure(Error()).getOrElse(doCall)
         Resource.Loading.getOrElse(doCall)
 
         verify(atMost = 2) { doCall() }
@@ -268,14 +270,14 @@ class ResourceKtTest {
 
     @Test
     fun getOrNull() {
-        assertEquals(Data, Resource.Result.Success(Data).getOrNull())
-        assertNull(Resource.Result.Failure(Error).getOrNull())
+        assertEquals(DataTest, Resource.Result.Success(DataTest).getOrNull())
+        assertNull(Resource.Result.Failure(ErrorTest()).getOrNull())
         assertNull(Resource.Loading.getOrNull())
     }
 
     @Test
     fun getOrThrow() {
-        assertEquals(Data, Resource.Result.Success(Data).getOrThrow())
+        assertEquals(DataTest, Resource.Result.Success(DataTest).getOrThrow())
         assertThrows<Throwable> { Resource.Result.Failure(Unit).getOrThrow() }
         assertThrows<Throwable> { Resource.Loading.getOrThrow() }
     }
@@ -283,18 +285,13 @@ class ResourceKtTest {
     @Test
     fun toResult() {
         assertEquals(
-            Result.success(Data),
-            Resource.Result.Success(Data).toResult()
+            Result.success(DataTest),
+            Resource.Result.Success(DataTest).toResult()
         )
-
-        val exception = Throwable("Test Error")
 
         assertEquals(
-            Result.failure<Unit>(exception),
-            Resource.Result.Failure(exception).toResult()
+            Result.failure<Unit>(ErrorTest("message")),
+            Resource.Result.Failure(ErrorTest("message")).toResult()
         )
     }
-
-    data object Data
-    data object Error
 }
