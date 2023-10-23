@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("java-library")
     id("maven-publish")
+    id("org.jetbrains.kotlinx.kover") version "0.7.3"
 }
 
 group = "com.neo.resource"
